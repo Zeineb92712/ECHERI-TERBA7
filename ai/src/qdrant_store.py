@@ -1,12 +1,9 @@
 from qdrant_client import QdrantClient
-from qdrant_client.models import VectorParams, Distance
+from qdrant_client.models import VectorParams, Distance, PointStruct
 
-COLLECTION_NAME = "products"
+COLLECTION_NAME = "product_catalog"
 
-client = QdrantClient(
-    url="YOUR_QDRANT_URL",
-    api_key="YOUR_API_KEY"
-)
+client = QdrantClient(path="ai/data/qdrant")
 
 def setup_collection():
     client.recreate_collection(
@@ -19,15 +16,17 @@ def setup_collection():
 
 def store(chunks, embeddings):
     points = []
-    for i, (text, vector) in enumerate(zip(chunks, embeddings)):
-        points.append({
-            "id": i,
-            "vector": vector.tolist(),
-            "payload": {"text": text}
-        })
+
+    for i, (chunk, vector) in enumerate(zip(chunks, embeddings)):
+        points.append(
+            PointStruct(
+                id=i,
+                vector=vector.tolist(),
+                payload={"text": chunk}
+            )
+        )
 
     client.upsert(
         collection_name=COLLECTION_NAME,
         points=points
     )
-    print(f"[INFO] Stored {len(points)} vectors")

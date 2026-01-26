@@ -3,6 +3,4 @@ from sentence_transformers import SentenceTransformer
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
 def embed_chunks(chunks):
-    embeddings = model.encode(chunks)
-    print(f"[INFO] Generated {len(embeddings)} embeddings")
-    return embeddings
+    return model.encode(chunks)

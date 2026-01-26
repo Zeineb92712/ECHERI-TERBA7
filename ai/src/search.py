@@ -1,22 +1,25 @@
 from sentence_transformers import SentenceTransformer
 from qdrant_client import QdrantClient
 
+COLLECTION_NAME = "product_catalog"
+
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
 client = QdrantClient(
-    url="YOUR_QDRANT_URL",
-    api_key="YOUR_API_KEY"
+    path="ai/data/qdrant"
 )
 
-def search(query: str, limit=5):
+def search(query: str, limit: int = 5):
     vector = model.encode(query).tolist()
 
-    results = client.search(
-        collection_name="products",
-        query_vector=vector,
+    results = client.query_points(
+        collection_name=COLLECTION_NAME,
+        query=vector,
         limit=limit
     )
 
-    for r in results:
-        print("----")
-        print(r.payload["text"])
+    print("\n🔎 SEARCH RESULTS:\n")
+
+    for point in results.points:
+        print("-----")
+        print(point.payload["text"])

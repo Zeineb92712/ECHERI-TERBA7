@@ -5,6 +5,4 @@ def chunk_text(text: str):
         chunk_size=500,
         chunk_overlap=100
     )
-    chunks = splitter.split_text(text)
-    print(f"[INFO] Created {len(chunks)} chunks")
-    return chunks
+    return splitter.split_text(text)
