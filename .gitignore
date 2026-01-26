@@ -1,0 +1,8 @@
+# Python
+ai/venv/
+
+# Node
+backend/node_modules/
+
+# Env files
+.env
