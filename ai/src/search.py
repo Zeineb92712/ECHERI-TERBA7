@@ -1,25 +1,16 @@
-from sentence_transformers import SentenceTransformer
-from qdrant_client import QdrantClient
+from ai.src.qdrant_store import get_client
+from ai.src.embedder import embed_texts
+from ai.src.config import COLLECTION_NAME
 
-COLLECTION_NAME = "product_catalog"
-
-model = SentenceTransformer("all-MiniLM-L6-v2")
-
-client = QdrantClient(
-    path="ai/data/qdrant"
-)
-
-def search(query: str, limit: int = 5):
-    vector = model.encode(query).tolist()
+def search(query: str, limit=5):
+    client = get_client()
+    vector = embed_texts([query])[0]
 
     results = client.query_points(
         collection_name=COLLECTION_NAME,
         query=vector,
-        limit=limit
+        limit=limit,
+        with_payload=True
     )
 
-    print("\n🔎 SEARCH RESULTS:\n")
-
-    for point in results.points:
-        print("-----")
-        print(point.payload["text"])
+    return results.points

@@ -1,30 +1,31 @@
 from qdrant_client import QdrantClient
 from qdrant_client.models import VectorParams, Distance, PointStruct
+from ai.src.config import COLLECTION_NAME, VECTOR_SIZE, QDRANT_PATH
 
-COLLECTION_NAME = "product_catalog"
+def get_client():
+    return QdrantClient(path=QDRANT_PATH)
 
-client = QdrantClient(path="ai/data/qdrant")
-
-def setup_collection():
+def recreate_collection():
+    client = get_client()
     client.recreate_collection(
         collection_name=COLLECTION_NAME,
         vectors_config=VectorParams(
-            size=384,
+            size=VECTOR_SIZE,
             distance=Distance.COSINE
         )
     )
 
-def store(chunks, embeddings):
-    points = []
+def upsert_chunks(texts: list[str], vectors: list[list[float]]):
+    client = get_client()
 
-    for i, (chunk, vector) in enumerate(zip(chunks, embeddings)):
-        points.append(
-            PointStruct(
-                id=i,
-                vector=vector.tolist(),
-                payload={"text": chunk}
-            )
+    points = [
+        PointStruct(
+            id=i,
+            vector=vectors[i],
+            payload={"text": texts[i]}
         )
+        for i in range(len(texts))
+    ]
 
     client.upsert(
         collection_name=COLLECTION_NAME,

@@ -1,6 +1,16 @@
 from sentence_transformers import SentenceTransformer
 
-model = SentenceTransformer("all-MiniLM-L6-v2")
+_model = None
 
-def embed_chunks(chunks):
-    return model.encode(chunks)
+def get_model():
+    global _model
+    if _model is None:
+        _model = SentenceTransformer(
+            "sentence-transformers/all-MiniLM-L6-v2",
+            cache_folder=".cache"
+        )
+    return _model
+
+def embed_texts(texts: list[str]) -> list[list[float]]:
+    model = get_model()
+    return model.encode(texts, show_progress_bar=True).tolist()

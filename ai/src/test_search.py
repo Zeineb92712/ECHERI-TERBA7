@@ -1,4 +1,8 @@
 from ai.src.search import search
 
-if __name__ == "__main__":
-    search("winter hiking jacket")
+results = search("winter hiking jacket")
+
+for r in results:
+    print("Score:", r.score)
+    print(r.payload["text"][:300])
+    print("----")
